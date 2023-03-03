@@ -30,11 +30,17 @@ current_language = GO_LANGUAGE
 openai.api_key = os.environ['OPENAI_API_KEY']
 
 # path to code directory to search/embed/query
-print("Please type in the path to the code directory you want to search/embed/query:")
-code_root = input()
-if code_root.strip() == "":
-    code_root = os.getcwd()
-
+code_root = None
+if os.path.exists(CACHED_EMBEDDINGS_PATH):
+    with open("previous_search_path.txt", "r") as file:
+        string_variable = file.read()
+else:
+    print("Please type in the path to the code directory you want to search/embed/query:")
+    code_root = input()
+    if code_root.strip() == "":
+        code_root = os.getcwd()
+    with open("previous_search_path.txt", "w") as file:
+        file.write(code_root)
 
 print("Type in your query/prompt:")
 code_query = input()
@@ -71,40 +77,29 @@ def get_functions(filepath):
         if not has_sibling:
             break
 
-
-code_files = [y for x in os.walk(code_root)
-              for y in glob(os.path.join(x[0], current_language[1]))]
-
-print("Total number of files found:", len(code_files))
-
-if len(code_files) == 0:
-    print("Double check that you have downloaded the openai-python repo and set the code_root variable correctly.")
-
-all_nodes = []
-for code_file in code_files:
-    nodes = list(get_functions(code_file))
-    for func in nodes:
-        all_nodes.append(func)
-
-node_count = len(all_nodes)
-print("Total number of functions extracted:", node_count)
-
-embeddings_count = 0
-
-
-def my_get_embedding(x):
-    global embeddings_count
-    embeddings_count += 1
-    print("Doing embedding (", embeddings_count, ") request for ", x)
-    get_embedding(x, engine='text-embedding-ada-002')
-
-
 df = None
 if os.path.exists(CACHED_EMBEDDINGS_PATH):
     print("\n\n\nWARNING: USING CACHED EMBEDDINGS!!!\n\n\n")
     df = pd.read_json(CACHED_EMBEDDINGS_PATH)
 else:
-    df = pd.DataFrame(all_nodes[:50])
+    code_files = [y for x in os.walk(code_root)
+                for y in glob(os.path.join(x[0], current_language[1]))]
+
+    print("Total number of files found:", len(code_files))
+
+    if len(code_files) == 0:
+        print("Double check that you have downloaded the openai-python repo and set the code_root variable correctly.")
+
+    all_nodes = []
+    for code_file in code_files:
+        nodes = list(get_functions(code_file))
+        for func in nodes:
+            all_nodes.append(func)
+
+    node_count = len(all_nodes)
+    print("Total number of functions extracted:", node_count)
+
+    df = pd.DataFrame(all_nodes)
     df['code_embedding'] = df['code'].apply(
         lambda x: get_embedding(x, engine='text-embedding-ada-002'))
     print("Done creating embeddings")
