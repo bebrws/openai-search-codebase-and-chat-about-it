@@ -19,6 +19,7 @@ There is a lot of code I am still refactoring and cleaning up. But it works grea
 
 ## TODO:
 - [ ] Combine embeddings of the same node_type that are adjacent to each other
+    (I have made changes in this branch to do this which look like they might be working.. cant focus on this right now. But its not giving back any answers now even though the embeddings look better)
 - [ ] Use num_tokens_from_string to make sure my embeddings/query are the right size
 
 ## Setup tree sitter parsers 

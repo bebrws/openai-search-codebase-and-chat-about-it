@@ -54,18 +54,35 @@ def get_functions(filepath):
 
     cursor.goto_first_child()
 
+    last_node_type = None
+    combined_code = ""
     while True:
-        print("type: ", cursor.node.type)
-        print("byte locations: ", cursor.node.start_byte,
-              " - ", cursor.node.end_byte)
         code = codestr[cursor.node.start_byte:cursor.node.end_byte]
         node_type = cursor.node.type
-        print("code:\n", code)
-        code_filename = {
-            "code": code, "node_type": node_type, "filepath": filepath}
-        if code.strip() != "":
-            print("code_filename: ", code_filename)
-            yield code_filename
+        print("-- node_type: ", node_type, " last_node_type: ",
+              last_node_type,  " code start:\n", code, "\n###")
+        if last_node_type == None or last_node_type == node_type:
+            combined_code += "\n" + code
+        else:
+            code_to_send = ""
+            if combined_code.strip() != "":
+                code_to_send = combined_code
+            else:
+                code_to_send = code
+
+            node_type_to_send = ""
+            if last_node_type == None:
+                node_type_to_send = node_type
+            else:
+                node_type_to_send = last_node_type
+
+            if code_to_send.strip() != "":
+                code_type_filename = {"code": code_to_send,
+                                      "node_type": node_type_to_send, "filepath": filepath}
+                print("SENDING code_type_filename: ", code_type_filename)
+                yield code_type_filename
+                combined_code = ""
+        last_node_type = node_type
         has_sibling = cursor.goto_next_sibling()
         if not has_sibling:
             break
