@@ -57,6 +57,7 @@ python3 -m pip install matplotlib
 python3 -m pip install plotly
 python3 -m pip install scipy
 python3 -m pip install sklearn
+python3 -m pip install scikit-learn
 python3 -m pip install pandas
 python3 -m pip install tree_sitter
 python3 -m pip install tiktoken

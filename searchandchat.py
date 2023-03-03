@@ -8,6 +8,7 @@ import openai
 
 from tree_sitter import Language, Parser
 
+RESULTS_CHAT_WITH = 200
 MAX_TOKENS = 6500  # 8191
 MAX_COMBINED_RESULTS_LENGTH = 6000
 CACHED_EMBEDDINGS_PATH = "code_search_openai.json"
@@ -120,7 +121,7 @@ if not query_embedding:
     sys.exit(1)
 
 
-def search_functions(df, number_similar_results=6, n_lines=1000):
+def search_functions(df, number_similar_results=200, n_lines=1000):
     df['similarities'] = df.code_embedding.apply(
         lambda x: cosine_similarity(x, query_embedding))
 
@@ -147,7 +148,7 @@ def search_functions(df, number_similar_results=6, n_lines=1000):
 
 
 print("Running search functions to find similar code")
-related_code = search_functions(df, number_similar_results=3)
+related_code = search_functions(df, number_similar_results=RESULTS_CHAT_WITH)
 header = """Answer the question using the provided context and any other available information."\n\nContext:\n"""
 final_prompt = header + \
     "".join(related_code) + "\n\n Q: " + code_query + "\n A:"
