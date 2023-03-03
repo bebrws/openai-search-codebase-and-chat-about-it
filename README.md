@@ -52,7 +52,7 @@ Language.build_library(
 to rebuild your own or add new languages.
 
 ## Install required packages/libraries
-
+```
 python3 -m pip install matplotlib
 python3 -m pip install plotly
 python3 -m pip install scipy
@@ -60,11 +60,12 @@ python3 -m pip install sklearn
 python3 -m pip install pandas
 python3 -m pip install tree_sitter
 python3 -m pip install tiktoken
-
-And you must install openai-python from the repo so you can use the new ChatCompletion API.
+```
+And you must install ```openai-python``` from the repo so you can use the new ChatCompletion API.
 
 ## Run it
 
+```
 python3 searchandchat.py
-
+```
 
